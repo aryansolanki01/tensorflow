@@ -18,6 +18,7 @@
 #include <atomic>
 #include <memory>
 #include <type_traits>
+#include <utility>
 #include <variant>
 
 #include "absl/types/span.h"
@@ -161,6 +162,25 @@ class LiteRtTensorBufferT {
   std::variant<HostBuffer, AhwbBuffer, IonBuffer, DmaBufBuffer, FastRpcBuffer>
       buffer_;
   mutable std::atomic_int_fast32_t ref_;
+};
+
+class LiteRtTensorBufferScopedLock {
+ public:
+  ~LiteRtTensorBufferScopedLock() { (void)tensor_buffer_.Unlock(); }
+
+  static litert::Expected<std::pair<LiteRtTensorBufferScopedLock, void*>>
+  Create(LiteRtTensorBufferT& tensor_buffer, LiteRtEvent event = nullptr) {
+    auto addr = tensor_buffer.Lock(event);
+    if (!addr) {
+      return addr.Error();
+    }
+    return std::make_pair(LiteRtTensorBufferScopedLock(tensor_buffer), *addr);
+  }
+
+ private:
+  explicit LiteRtTensorBufferScopedLock(LiteRtTensorBufferT& tensor_buffer)
+      : tensor_buffer_(tensor_buffer) {}
+  LiteRtTensorBufferT& tensor_buffer_;
 };
 
 #endif  // TENSORFLOW_LITE_EXPERIMENTAL_LITERT_RUNTIME_TENSOR_BUFFER_H_

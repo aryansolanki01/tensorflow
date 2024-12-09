@@ -194,6 +194,8 @@ class TensorBuffer
 
 class TensorBufferScopedLock {
  public:
+  TensorBufferScopedLock(const TensorBufferScopedLock& arg) = delete;
+  TensorBufferScopedLock(TensorBufferScopedLock&& arg) = default;
   ~TensorBufferScopedLock() { (void)tensor_buffer_.Unlock(); }
 
   static Expected<std::pair<TensorBufferScopedLock, void*>> Create(
