@@ -65,6 +65,23 @@ cc_library(
 )
 
 cc_library(
+    name = "environment",
+    srcs = ["environment.cc"],
+    hdrs = [
+        "environment.h",
+        "//tensorflow/lite/experimental/litert/c:litert_environment.h",
+    ],
+    deps = [
+        "//tensorflow/lite/experimental/litert/c:litert_any",
+        "//tensorflow/lite/experimental/litert/c:litert_common",
+        "//tensorflow/lite/experimental/litert/c:litert_logging",
+        "//tensorflow/lite/experimental/litert/cc:litert_any",
+        "//tensorflow/lite/experimental/litert/cc:litert_expected",
+        "@com_google_absl//absl/types:span",
+    ],
+)
+
+cc_library(
     name = "filesystem",
     srcs = ["filesystem.cc"],
     hdrs = ["filesystem.h"],
